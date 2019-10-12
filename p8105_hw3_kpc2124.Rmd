@@ -3,12 +3,36 @@ title: "Homework 3 - Visualization and EDA"
 author: "Kristi Chau"
 date: "10/5/2019"
 output: github_document
+fig_caption: yes
+latex_engine: xelatex
+header-includes:
+   - \usepackage{floatrow}
+   - \floatsetup[figure]{capposition=top}
+   - \usepackage{booktabs}
+   - \usepackage{longtable}
+   - \usepackage{array}
+   - \usepackage{multirow}
+   - \usepackage{wrapfig}
+   - \usepackage{float}
+   - \usepackage{colortbl}
+   - \usepackage{pdflscape}
+   - \usepackage{tabu}
+   - \usepackage{threeparttable}
+   - \usepackage{threeparttablex}
+   - \usepackage[normalem]{ulem}
+   - \usepackage[normalem]{ulem}
+   - \usepackage[utf8]{inputenc}
+   - \usepackage{makecell}
+   - \usepackage{xcolor}
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 
 library(tidyverse)
+library(knitr)
+options(kableExtra.latex.load_packages = FALSE)
+library(kableExtra)
 library(viridis)
 
 knitr::opts_chunk$set(
@@ -57,7 +81,7 @@ most_items_aisle = instacart %>%
 ## Problem 1b: Make a plot that shows the number of items ordered in each aisle, limiting this to aisles with more than 10000 items ordered. Arrange aisles sensibly, and organize your plot so others can read it.
 
 ```{r}
-instacart %>% 
+instacart_plot = instacart %>% 
   group_by(aisle) %>% 
   mutate(freq = n()) %>% 
   ungroup() %>% 
@@ -74,7 +98,7 @@ instacart %>%
     title = "Number of Items Ordered, By Aisle",
     y = "Number of Items Ordered (in 1000s)",
     x = "Aisle Name",
-    caption = "Data from the Instacart") +
+    caption = "Data from Instacart") +
   theme(
     axis.text.x = element_text(angle = 90),
     legend.position = "right") + 
@@ -82,6 +106,8 @@ instacart %>%
   scale_y_continuous(
   breaks = c(10,25,50,75,100,150), 
   labels = c("10","25","50","75","100","150"))
+
+instacart_plot
 ```
 
 **10,000+ items were ordered from 39 aisles out of the total 134 aisles. Out of these 39 aisles, the `butter` aisle had the least items ordered, while `fresh fruits` and `fresh vegetables` had over 150,000 items ordered, far surpassing the 3rd ranked aisle, which was `packaged vegetables fruits`, with 78,493 items ordered.**
@@ -89,16 +115,55 @@ instacart %>%
 ## Problem 1c: Make a table showing the three most popular items in each of the aisles “baking ingredients”, “dog food care”, and “packaged vegetables fruits”. Include the number of times each item is ordered in your table.
 
 ```{r}
-
+instacart %>%
+  group_by(aisle,product_name) %>%
+  filter(aisle %in% c("baking ingredients", "dog food care", "packaged vegetables fruits")) %>%
+  mutate(freq = n()) %>%
+  arrange(aisle,desc(freq)) %>%
+  distinct(aisle,product_name,freq) %>%
+  ungroup() %>% 
+  group_by(aisle) %>%
+  mutate(rank = dense_rank(desc(freq))) %>%
+  filter(rank %in% c(1,2,3)) %>%
+  select(aisle,rank,product_name,freq) %>% 
+  kable(
+    caption = "Most popular items in 'Baking Ingredients', 'Dog Food Care', and 'Packaged Vegetables Fruits' Aisles",
+    col.names = c("Aisle Name",
+                  "Ranking",
+                  "Product Name",
+                  "Number of Items Purchased"))
 ```
+
+**The 3 most popular `Baking Ingredients` items are `Light Brown Sugar`, `Pure Baking Soda`, and `Cane Sugar`. The 3 most popular `Dog Food Care` items are `Snack Sticks Chicken & Rice Recipe Dog Treats` `Organix Chicken & Brown Rice Recipe`, and `Small Dog Biscuits`. The 3 most popular `Packaged Vegetables Fruits` items are `Organic Baby Spinach`, `Organic Raspberries`, and `Organic Blueberries`.**
 
 ## Problem 1d: Make a table showing the mean hour of the day at which Pink Lady Apples and Coffee Ice Cream are ordered on each day of the week; format this table for human readers (i.e. produce a 2 x 7 table).
 
 ```{r}
-
+instacart %>%
+  select(product_name,order_dow,order_hour_of_day) %>%
+  filter(product_name %in% c("Pink Lady Apples","Coffee Ice Cream")) %>%
+  group_by(product_name,order_dow) %>%
+  mutate(mean_hod = mean(order_hour_of_day)) %>% 
+  distinct(product_name,order_dow,mean_hod) %>%
+  arrange(order_dow) %>%
+  pivot_wider(
+    names_from = "order_dow",
+    values_from = "mean_hod"
+  ) %>%
+  kable(
+    caption = "Mean hour of the day, by day of the week, at which Pink Lady Apples and Coffee Ice Cream are ordered",
+    col.names = c("Product Name",
+                  "Sunday",
+                  "Monday",
+                  "Tuesday",
+                  "Wednesday",
+                  "Thursday",
+                  "Friday",
+                  "Saturday")
+  )
 ```
 
-
+**`Pink Lady Apples`, on average, are ordered the earliest on Mondays at `11.36` hours and the latest on Wednesdays at `14.25` hours. `Coffee Ice Cream`, on average, is ordered the earliest on Fridays at `12.26` hours and the latest on Tuesdays at `15.38` hours.**
 
 
 
