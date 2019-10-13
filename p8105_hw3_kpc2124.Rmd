@@ -30,6 +30,7 @@ header-includes:
 knitr::opts_chunk$set(echo = TRUE)
 
 library(tidyverse)
+library(lubridate)
 library(knitr)
 options(kableExtra.latex.load_packages = FALSE)
 library(kableExtra)
@@ -64,7 +65,7 @@ data("instacart")
 
 The `instacart` data set has **`r nrow(instacart)`** observations and **`r ncol(instacart)`** variables, which gives **`r nrow(instacart) * ncol(instacart)`** distinct datapoints. Some key variables of this dataset are: **`r colnames(instacart)[1]`**, which ensures all items ordered are associated with the same order, **`r colnames(instacart)[5]`**, who placed the order, **`r colnames(instacart)[11]`**, what product was ordered, and **`r colnames(instacart)[15]`**, what department the product is from. The most orders made by a customer is **`r max(instacart[7])`**. The most popular item ordered is **`r names(which.max(table(instacart[11])))`**.
 
-## Problem 1a: How many aisles are there, and which aisles are the most items ordered from?
+*1a: How many aisles are there, and which aisles are the most items ordered from?*
 
 ```{r}
 
@@ -79,7 +80,7 @@ most_items_aisle = instacart %>%
 
 **There are `r pull(count_aisles,n)` aisles total. The aisle with the most items ordered is `r pull(most_items_aisle,aisle)` with a total of `r pull(most_items_aisle,n)` items ordered from that aisle.**
 
-## Problem 1b: Make a plot that shows the number of items ordered in each aisle, limiting this to aisles with more than 10000 items ordered. Arrange aisles sensibly, and organize your plot so others can read it.
+*1b: Make a plot that shows the number of items ordered in each aisle, limiting this to aisles with more than 10000 items ordered. Arrange aisles sensibly, and organize your plot so others can read it.*
 
 ```{r}
 instacart_plot = instacart %>% 
@@ -113,7 +114,7 @@ instacart_plot
 
 **10,000+ items were ordered from 39 aisles out of the total 134 aisles. Out of these 39 aisles, the `butter` aisle had the least items ordered, while `fresh fruits` and `fresh vegetables` had over 150,000 items ordered, far surpassing the 3rd ranked aisle, which was `packaged vegetables fruits`, with 78,493 items ordered.**
 
-## Problem 1c: Make a table showing the three most popular items in each of the aisles “baking ingredients”, “dog food care”, and “packaged vegetables fruits”. Include the number of times each item is ordered in your table.
+*1c: Make a table showing the three most popular items in each of the aisles “baking ingredients”, “dog food care”, and “packaged vegetables fruits”. Include the number of times each item is ordered in your table.*
 
 ```{r}
 instacart %>%
@@ -137,7 +138,7 @@ instacart %>%
 
 **The 3 most popular `Baking Ingredients` items are `Light Brown Sugar`, `Pure Baking Soda`, and `Cane Sugar`. The 3 most popular `Dog Food Care` items are `Snack Sticks Chicken & Rice Recipe Dog Treats` `Organix Chicken & Brown Rice Recipe`, and `Small Dog Biscuits`. The 3 most popular `Packaged Vegetables Fruits` items are `Organic Baby Spinach`, `Organic Raspberries`, and `Organic Blueberries`.**
 
-## Problem 1d: Make a table showing the mean hour of the day at which Pink Lady Apples and Coffee Ice Cream are ordered on each day of the week; format this table for human readers (i.e. produce a 2 x 7 table).
+*1d: Make a table showing the mean hour of the day at which Pink Lady Apples and Coffee Ice Cream are ordered on each day of the week; format this table for human readers (i.e. produce a 2 x 7 table).*
 
 ```{r}
 instacart %>%
@@ -166,6 +167,8 @@ instacart %>%
 
 **`Pink Lady Apples`, on average, are ordered the earliest on Mondays at `11.36` hours and the latest on Wednesdays at `14.25` hours. `Coffee Ice Cream`, on average, is ordered the earliest on Fridays at `12.26` hours and the latest on Tuesdays at `15.38` hours.**
 
+
+
 # Problem 2
 
 ```{r, include = FALSE}
@@ -173,7 +176,7 @@ library(p8105.datasets)
 data("brfss_smart2010")
 ```
 
-## Data Cleaning
+*Data Cleaning*
 
 ```{r}
 brfss_df = 
@@ -183,9 +186,9 @@ brfss_df =
   arrange(factor(response, levels =  c("Poor","Fair","Good","Very good","Excellent")))
 ```
 
-## Problem 2a: In 2002, which states were observed at 7 or more locations? What about in 2010?
+*2a: In 2002, which states were observed at 7 or more locations? What about in 2010?*
 
-```{r}
+```{r, results = FALSE}
 brfss_df %>%
   filter(year == 2002) %>%
   distinct(locationabbr,locationdesc) %>%
@@ -195,7 +198,7 @@ brfss_df %>%
 
 **In 2002, `Connecticut, Florida, Massachusetts, North Carolina, New Jersey, and Pennsylvania` were observed at 7 or more locations.**
 
-```{r}
+```{r, results = FALSE}
 brfss_df %>%
   filter(year == 2010) %>%
   distinct(locationabbr,locationdesc) %>%
@@ -205,7 +208,7 @@ brfss_df %>%
 
 **In 2010, `California, Colorado, Flordia, Massachusetts, Maryland, North Carolina, Nebraska, New Jersey, New York, Ohio, Pennsylvania, South Carolina, Texas, and Washington` were observed at 7 or more locations.**
 
-## Problem 2b: Construct a dataset that is limited to Excellent responses, and contains, year, state, and a variable that averages the data_value across locations within a state. Make a “spaghetti” plot of this average value over time within a state (that is, make a plot showing a line for each state across years – the geom_line geometry and group aesthetic will help).
+*2b: Construct a dataset that is limited to Excellent responses, and contains, year, state, and a variable that averages the data_value across locations within a state. Make a “spaghetti” plot of this average value over time within a state (that is, make a plot showing a line for each state across years – the geom_line geometry and group aesthetic will help).*
 
 ```{r}
 brfss_df %>%
@@ -226,7 +229,7 @@ brfss_df %>%
 
 **Given that we are observing the mean data value across time for all states in this dataset, it is difficult to see if there are any trends of prevalence of landline telephones over time unless we focus on individual states or on a smaller subset of states.**
 
-## Problem 2c: Make a two-panel plot showing, for the years 2006, and 2010, distribution of data_value for responses (“Poor” to “Excellent”) among locations in NY State.
+*2c: Make a two-panel plot showing, for the years 2006, and 2010, distribution of data_value for responses (“Poor” to “Excellent”) among locations in NY State.*
 
 ```{r}
 brfss_df %>%
@@ -246,4 +249,77 @@ brfss_df %>%
 
 **The distribution of data_value (the prevalence of landlines) for responses among locations in NY State seem to follow similar patterns between 2006 and 2010. The prevalence of landlines was lowest among those who responded that their general health was poor across all locations in 2006 and 2010, followed by "Fair" and "Excellent" responses. Depending on location, the prevalence of landlines was highest in those who responded "Good" or "Very good".**
 
+
+
+# Problem 3
+
+*3a: Load, tidy, and otherwise wrangle the data. Your final dataset should include all originally observed variables and values; have useful variable names; include a weekday vs weekend variable; and encode data with reasonable variable classes. Describe the resulting dataset (e.g. what variables exist, how many observations, etc).*
+
+```{r}
+accel_data = read_csv("./data/accel_data.csv", col_types = cols(
+  week = col_integer(),
+  day_id = col_integer()
+)) %>%
+  janitor::clean_names() %>%
+  pivot_longer(
+    activity_1:activity_1440,
+    names_to = "activity",
+    names_prefix = "activity_",
+    names_ptypes = list(activity = integer()),
+    values_to = "counts"
+  ) %>% 
+  mutate(day_of_week = ifelse(day %in% c("Saturday","Sunday"),"weekend","weekday"))
+```
+
+**The variables in this dataset are `r colnames(accel_data)[1:6]` There are `r nrow(accel_data)` rows and `r ncol(accel_data)` columns for a total of `r nrow(accel_data) * ncol(accel_data)` observations. This patient was observed for `r max(pull(accel_data,day_id))` days and had a mean activity count of `r round(mean(pull(accel_data,counts)),2)` per minute.**
+
+*3b: Traditional analyses of accelerometer data focus on the total activity over the day. Using your tidied dataset, aggregate across minutes to create a total activity variable for each day, and create a table showing these totals. Are any trends apparent?*
+
+```{r}
+accel_data %>%
+  mutate(
+    day = factor(day, levels = c("Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", ordered = TRUE)),
+    day_num = as.integer(day)
+  ) %>%
+  group_by(week, day_num) %>%
+  mutate(total_activity = sum(counts)) %>%
+  ungroup() %>%
+  arrange(week,day_num) %>%
+  distinct(week,day,total_activity,day_of_week) %>%
+  kable(
+    caption = "Total Daily Activity over 5 weeks",
+    col.names = c("Week",
+                  "Day",
+                  "Total Activity",
+                  "Weekday/Weekend")
+    )
+```
+
+**On first glance, it appears as though this patient is more active on Fridays and weekends, however, in the later weeks, this pattern dissipates and total daily activity varies more.**
+
+*3c: Accelerometer data allows the inspection activity over the course of the day. Make a single-panel plot that shows the 24-hour activity time courses for each day and use color to indicate day of the week. Describe in words any patterns or conclusions you can make based on this graph.*
+
+```{r, message = FALSE}
+accel_data %>%
+  mutate(
+    day = ordered(day,levels = c("Sunday", "Monday", 
+    "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"))) %>%
+  ggplot(aes(x = activity, y = counts, color = day)) +
+  geom_smooth(size = 2) +
+  labs(
+    title = "Average 24-hour Activity Course, by Day",
+    x = "Hour",
+    y = "Average Hourly Activity",
+    caption = "Data from CUMC") +
+  theme(
+    legend.position = "right",
+    panel.grid.major.x = element_line(color = "grey50")
+  ) + 
+  scale_colour_discrete(name = "Day of the Week") +
+  scale_x_continuous(
+  breaks = c(60,120,180,240,300,360,420,480,540,600,660,720,780,840,900,960,1020,1080,1140,1200,1260,1320,1380,1440), 
+  labels = c("1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24"))
+```
+
+**On average, there was a period of high activity on Friday nights, peaking around 9-9:30pm. On Sundays, there was a period of high activity that peaked around 10:30-11am. On average, Saturdays appear to have the least amount of activity across the 5 weeks.**
 
